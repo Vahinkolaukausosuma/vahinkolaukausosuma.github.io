@@ -82,11 +82,7 @@
 
 <div id="drop-zone">Drop your .exe here or click to select</div>
 <input type="file" id="file-input" accept=".exe" style="display:none" />
-<br>
-<br>
-<br>
-<br>
-<br>
+
 <script>
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
@@ -139,11 +135,12 @@ function patchExe(buffer) {
 
   
   for(let i = 0; i < Patch1.length; i++) {
-    bytes[0xC01F02+i] = Patch1[i];
+    bytes[0x801F02+i] = Patch1[i];
   }
   
+  
   for(let i = 0; i < Patch2.length; i++) {
-    bytes[0x5a6c68+i] = Patch2[i];
+    bytes[0x1a6c68+i] = Patch2[i];
   }
   
   
