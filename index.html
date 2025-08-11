@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=400" />
+<style>
+  body {
+    background: #2e3440;
+    color: #d8dee9;
+    font-family: 'Fira Code', monospace, monospace;
+    padding: 2rem;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #88c0d0;
+	
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+	font-size: 1.3rem;
+	<!-- max-width: 50%;  -->
+  }
+  .download-link {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold; 
+  color: #88c0d0; 
+  text-decoration: none; 
+  display: inline-block;
+  margin-top: 1rem;
+  transition: color 0.3s ease;
+  
+}
+.download-link:hover {
+  color: #81a1c1;        /* lighter on hover */
+  text-decoration: underline;
+}
+  pre {
+    background: #3b4252;
+    border-radius: 20px;
+	max-width: 450px; 
+    padding: 1.5rem;
+    overflow-x: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    line-height: 1.5;
+    font-size: 14px;
+  }
+  #drop-zone {
+    width: 300px;
+    height: 150px;
+    border: 3px dashed #aaa;
+    border-radius: 8px;
+    line-height: 150px;
+    text-align: center;
+    font-family: sans-serif;
+    color: #0;
+    margin: 20px auto;
+    user-select: none;
+  }
+  #drop-zone.dragover {
+    border-color: #FF66ff;
+    color: #00FFFF;
+  }
+    code {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+</style>
+</head>
+<body>
+<div> 
+<h1>Fallen Earth Client Patcher, for better PVP position networking</h1>
+<h2>Either drop your (NEWEST VERSION) Frontend.exe on the drop box, or download prepatched Frontend.exe </h2> 
+	
+	<div style="text-align:center">
+  <a href="patched-tool.zip" download class="download-link">-&gt;Prepatched&lt;-</a>
+</div>
+</div>
+
+<div id="drop-zone">Drop your .exe here or click to select</div>
+<input type="file" id="file-input" accept=".exe" style="display:none" />
+<br>
+<br>
+<br>
+<br>
+<br>
+<script>
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) {
+    handleFile(e.dataTransfer.files[0]);
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (fileInput.files.length > 0) {
+    handleFile(fileInput.files[0]);
+  }
+});
+
+function handleFile(file) {
+  if (!file.name.endsWith('.exe')) {
+    alert('Please drop a .exe file');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const arrayBuffer = evt.target.result;
+    const patchedBuffer = patchExe(arrayBuffer);
+    downloadPatchedExe(patchedBuffer, file.name);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function patchExe(buffer) {
+  const bytes = new Uint8Array(buffer);
+	const Patch1 = [0x50,0x83,0xFB,0x00,0x75,0x22,0xFF,0x15,0x24,0x21,0xC0,0x00,0x2B,0x05,0x69,0x34,0xCB,0x00,0x83,0xF8,0x50,0x76,0x11,0x8B,0x1D,0x99,0x34,0xCB,0x00,0xFF,0x15,0x24,0x21,0xC0,0x00,0xA3,0x69,0x34,0xCB,0x00,0x58,0x66,0x85,0xDB,0x0F,0x84,0xEB,0x4D,0x9A,0xFF,0xE9,0x38,0x4D,0x9A,0xFF]
+	const Patch2 = [0xE9,0x95,0xB2,0x65,0x00,0x90,0x90,0x90,0x90]
+
+  
+  for(let i = 0; i < Patch1.length; i++) {
+    bytes[0xC01F02+i] = Patch1[i];
+  }
+  
+  for(let i = 0; i < Patch2.length; i++) {
+    bytes[0x5a6c68+i] = Patch2[i];
+  }
+  
+  
+  return bytes.buffer;
+}
+
+function downloadPatchedExe(buffer, originalName) {
+  const blob = new Blob([buffer], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = originalName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+</script>
+
+</body>
+
+</html>
