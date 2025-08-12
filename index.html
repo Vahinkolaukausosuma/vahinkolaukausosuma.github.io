@@ -143,7 +143,7 @@ function patchExe(buffer) {
     bytes[0x1a6c68+i] = Patch2[i];
   }
   
-  bytes[0x8b3499] = 0xA4;
+  bytes[0x8b3499] = 20;
   return bytes.buffer;
 }
 
